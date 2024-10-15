@@ -33,11 +33,13 @@ public class Money {
 	 * @param amount
 	 */
 	protected void setAmount(double amount) {
-		if(amount < 0.01) {
-			throw new IllegalArgumentException("Amount of monye cannot be lesser then 1 cent ($0.01)");
+		if((amount < 0.01) && (amount > 0)){
+			moneyLogger.error("Amount of money cannot be lesser then 1 cent ($0.01)");
+			throw new IllegalArgumentException("Amount of money cannot be lesser then 1 cent ($0.01)");
 		}
 		else if(amount > 2000000000) {
-			throw new IllegalArgumentException("Amount of monye cannot be bigger then 2 billion($2000000000.00)");
+			moneyLogger.error("Amount of money cannot be bigger then 2 billion($2000000000.00)");
+			throw new IllegalArgumentException("Amount of money cannot be bigger then 2 billion($2000000000.00)");
 		}
 		this.amount=((int)Math.round(amount*100))/100;
 	}
