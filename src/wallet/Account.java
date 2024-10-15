@@ -18,13 +18,18 @@ public class Account extends Money {
 	 */
 	public Account(Currency_t currency) {
 		super(0, currency);
-		balance=new Money(0, currency);
-		AccountLogger.info("A new account was created!");
+		this.balance=new Money(0, currency);
+		AccountLogger.info("A new account, id: " + this.id + " was created!");
 	}
 	
-	public Account(Currency_t currency, Money startBalance) {
-		super(0, currency);
-		balance=new Money(startBalance.getAmount(), currency);
+	/**
+	 * Class constructor specifying the currency type and the starting value
+	 * @param currency
+	 * @param startBalance
+	 */
+	public Account(Money startBalance) {
+		super(0, startBalance.getCurrency());
+		this.balance=new Money(startBalance.getAmount(), startBalance.getCurrency());
 	}
 	
 	@Override
@@ -36,16 +41,20 @@ public class Account extends Money {
 	 */
 	public void addFunds(Money funds) {
 		if (funds.getAmount() > 0) {
-			if(balance.currencyMatch(funds.getCurrency())) {
-				balance.setAmount(balance.getAmount() + funds.getAmount());
+			if(this.balance.currencyMatch(funds.getCurrency())) {
+				this.balance.setAmount(this.balance.getAmount() + funds.getAmount());
 			}
 			else {
+				AccountLogger.error("It is not possible to add money from other currencies right now!");
 				throw new IllegalArgumentException("It is not possible to add money from other currencies right now!");
 			}
 		}
 		else {
+			AccountLogger.error("It is not possible to add negative money!");
 			throw new IllegalArgumentException("It is not possible to add negative money!");
 		}
+
+		AccountLogger.debug("A total amount of " + funds.getAmount() + " was added sucessfuly!");
 	}
 	
 	/**
@@ -54,18 +63,21 @@ public class Account extends Money {
 	 */
 	public void withdrawFunds(Money desiredFunds) {
 		if(desiredFunds.getAmount() < 0) {
+			AccountLogger.error("It is not possible to withdraw negative money!");
 			throw new IllegalArgumentException("It is not possible to withdraw negative money!");
 		}
 		
-		if (desiredFunds.getAmount() > balance.getAmount()) {
+		if (desiredFunds.getAmount() > this.balance.getAmount()) {
+			AccountLogger.error("It is not possible to withdraw more money than what is available!");
 			throw new IllegalArgumentException("It is not possible to withdraw more money than what is available!");
 		}
 		
-		if(balance.currencyMatch(desiredFunds.getCurrency())) {
+		if(!this.balance.currencyMatch(desiredFunds.getCurrency())) {
+			AccountLogger.error("It is not possible to add money from other currencies right now!");
 			throw new IllegalArgumentException("It is not possible to add money from other currencies right now!");
 		}
 			
-		balance.setAmount(balance.getAmount() - desiredFunds.getAmount());
-		
+		this.balance.setAmount(this.balance.getAmount() - desiredFunds.getAmount());
+		AccountLogger.debug("A total amount of " + desiredFunds.getAmount() + " was withdrawn sucessfuly!");
 	}
 }
