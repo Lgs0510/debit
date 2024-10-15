@@ -1,6 +1,7 @@
 package wallet;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 
 import org.apache.logging.log4j.*;
 
@@ -8,9 +9,13 @@ import org.apache.logging.log4j.*;
  * Account class implements a simple account type, that has money and methods to get, add and withdraw funds
  */
 public class Account extends Money {
-	private Money balance;
-	private Currency_t currency=Currency_t.BRL;
+	//Static variables
+	private static ArrayList<Boolean> idList = new ArrayList<Boolean>();
+	private static int biggestId=0;
 	private static Logger AccountLogger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+	// Non-Static variables
+	private Money balance;
+	protected int id;
 	
 	/**
 	 * Class constructor specifying the currency type
@@ -19,6 +24,7 @@ public class Account extends Money {
 	public Account(Currency_t currency) {
 		super(0, currency);
 		this.balance=new Money(0, currency);
+		this.id=idDealer();
 		AccountLogger.info("A new account, id: " + this.id + " was created!");
 	}
 	
@@ -30,7 +36,31 @@ public class Account extends Money {
 	public Account(Money startBalance) {
 		super(0, startBalance.getCurrency());
 		this.balance=new Money(startBalance.getAmount(), startBalance.getCurrency());
+		this.id=idDealer();
+		AccountLogger.info("A new account, id: " + this.id + " was created!");
 	}
+	
+	/**
+	 * allocate and return a new/available ID number
+	 * @return
+	 */
+	private static int idDealer() {
+		int emptyIndex=0;
+		int curId=0;
+
+		if(idList.contains(Boolean.FALSE)) {
+			emptyIndex = idList.indexOf(Boolean.FALSE);
+			idList.set(emptyIndex, Boolean.TRUE);
+			curId=emptyIndex;
+		}
+		else {
+			idList.add(Boolean.TRUE);
+		}
+		biggestId=idList.lastIndexOf(Boolean.TRUE);
+		curId=biggestId;
+		return curId;
+	}
+	
 	
 	@Override
 	public double getAmount() {return this.balance.getAmount();}
