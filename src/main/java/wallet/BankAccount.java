@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package wallet;
 
 import java.io.File;
@@ -10,15 +13,19 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+
+/**
+ * 
+ */
 public class BankAccount extends Account {
 	private static Logger bankAccLogger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 	private static HashMap<String, String> bankCodesMap = new HashMap<>();
 	private String bankName;
 	private String accountNumber;
 	private String accountAgency;
-
+	
 	/**
-	 * Class Constructor
+	 * @param currency
 	 */
 	public BankAccount(String bankName, String bankID, String accountNumber, String accountAgency) {
 		super(Currency_t.BRL);

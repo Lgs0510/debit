@@ -1,5 +1,10 @@
+/**
+ * 
+ */
 package wallet;
- import java.lang.invoke.MethodHandles; 
+
+import java.lang.invoke.MethodHandles;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +23,12 @@ public class Money {
 	 */
 	public Money(double amount, Currency_t currency) {		
 		setAmount(amount);
-		this.currency = currency;
+		if(Currency_t.validValue(currency)) {
+			this.currency = currency;
+		}
+		else {
+			throw new IllegalArgumentException("Invalid Currency!");
+		}
 		moneyLogger.info("A new money was created!");
 	}
 
@@ -33,15 +43,15 @@ public class Money {
 	 * @param amount
 	 */
 	protected void setAmount(double amount) {
-		if((amount < 0.01) && (amount > 0)){
+		if((Math.abs(amount) < 0.01) && (Math.abs(amount) > 0)){
 			moneyLogger.error("Amount of money cannot be lesser then 1 cent ($0.01)");
 			throw new IllegalArgumentException("Amount of money cannot be lesser then 1 cent ($0.01)");
 		}
-		else if(amount > 2000000000) {
+		else if(Math.abs(amount) > 2000000000) {
 			moneyLogger.error("Amount of money cannot be bigger then 2 billion($2000000000.00)");
 			throw new IllegalArgumentException("Amount of money cannot be bigger then 2 billion($2000000000.00)");
 		}
-		this.amount=((int)Math.round(amount*100))/100;
+		this.amount=(Math.round(amount*100))/100;
 	}
 	
 	/**

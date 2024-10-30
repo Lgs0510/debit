@@ -1,12 +1,14 @@
+/**
+ * 
+ */
 package wallet;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.*;
-
-/**
- * Account class implements a simple account type, that has money and methods to get, add and withdraw funds
+/*
+ * 
  */
 public class Account extends Money {
 	//Static variables
