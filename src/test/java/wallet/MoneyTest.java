@@ -1,7 +1,7 @@
 /**
  * 
  */
-package io.github.Lgs0510.walletManager;
+package wallet;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -14,9 +14,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import wallet.Currency_t;
-import wallet.Money;
 
 /**
  * 
