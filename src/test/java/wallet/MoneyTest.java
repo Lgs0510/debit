@@ -97,12 +97,10 @@ public class MoneyTest {
 	 @ParameterizedTest
 	 @MethodSource("testConstInvalidParValInput")
 	 void testConstructorInvalidParameters(double amount, Currency_t currency, RuntimeException exept, String msg) {
-		 String excepMsg;
 		 Exception exception = assertThrows(exept.getClass(), ()->{
 			 new Money(amount, currency);
 		 });
-		 excepMsg=exception.getMessage();
-		 assertTrue(msg.equals(excepMsg));
+		 assertEquals(msg,exception.getMessage());
 	 }
 	 static Stream<Arguments> testConstInvalidParValInput(){
 		 return Stream.of(
