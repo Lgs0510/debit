@@ -41,7 +41,13 @@ public class Account extends Money {
 		this.id=idDealer();
 		AccountLogger.info("A new account, id: " + this.id + " was created!");
 	}
-	
+
+	/**
+	 * Free account ID 
+	 */
+	public void ClosseAccount() {
+		idList.set(this.id, Boolean.FALSE);
+	}
 	/**
 	 * allocate and return a new/available ID number
 	 * @return
@@ -57,35 +63,39 @@ public class Account extends Money {
 		}
 		else {
 			idList.add(Boolean.TRUE);
+			biggestId=idList.lastIndexOf(Boolean.TRUE);
+			curId=biggestId;
 		}
-		biggestId=idList.lastIndexOf(Boolean.TRUE);
-		curId=biggestId;
 		return curId;
 	}
 	
 	
 	@Override
 	public double getAmount() {return this.balance.getAmount();}
+	public int getAccID() {return this.id;}
 
 	/**
 	 * Add funds' amount of money to the current account IF currency match and "funds" is greater than zero
 	 * @param funds
 	 */
 	public void addFunds(Money funds) {
-		if (funds.getAmount() > 0) {
-			if(this.balance.currencyMatch(funds.getCurrency())) {
-				this.balance.setAmount(this.balance.getAmount() + funds.getAmount());
-			}
-			else {
-				AccountLogger.error("It is not possible to add money from other currencies right now!");
-				throw new IllegalArgumentException("It is not possible to add money from other currencies right now!");
-			}
-		}
-		else {
+		
+		if (funds.getAmount() < 0) {
 			AccountLogger.error("It is not possible to add negative money!");
 			throw new IllegalArgumentException("It is not possible to add negative money!");
 		}
-
+		
+		if(!this.balance.currencyMatch(funds.getCurrency())) {
+			AccountLogger.error("It is not possible to add money from other currencies right now!");
+			throw new IllegalArgumentException("It is not possible to add money from other currencies right now!");
+		}
+			
+		if(this.getAmount() + funds.getAmount() > 3000000000.00) {
+			AccountLogger.error("Amount of money in the account cannot be bigger then 4 billion($4000000000.00)");
+			throw new IllegalArgumentException("Amount of money in the account cannot be bigger then 4 billion($4000000000.00)");
+		}
+		
+		this.balance.setAmount(this.balance.getAmount() + funds.getAmount());
 		AccountLogger.debug("A total amount of " + funds.getAmount() + " was added sucessfuly!");
 	}
 	
@@ -105,8 +115,8 @@ public class Account extends Money {
 		}
 		
 		if(!this.balance.currencyMatch(desiredFunds.getCurrency())) {
-			AccountLogger.error("It is not possible to add money from other currencies right now!");
-			throw new IllegalArgumentException("It is not possible to add money from other currencies right now!");
+			AccountLogger.error("It is not possible to retrieve money from other currencies right now!");
+			throw new IllegalArgumentException("It is not possible to retrieve money from other currencies right now!");
 		}
 			
 		this.balance.setAmount(this.balance.getAmount() - desiredFunds.getAmount());
