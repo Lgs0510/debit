@@ -6,7 +6,9 @@ package wallet;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,7 +25,6 @@ public class BankAccount extends Account {
 	private String bankName;
 	private String accountNumber;
 	private String accountAgency;
-	
 	/**
 	 * @param currency
 	 */
@@ -33,6 +34,15 @@ public class BankAccount extends Account {
 		if(!checkBankIdVsName(bankName, bankID)){
 			bankAccLogger.error("The bank name does not match the bank ID");
 			throw new IllegalArgumentException("The bank name does not match the bank ID");
+		}
+		if((accountNumber == null) || (accountNumber == "")){
+			bankAccLogger.error("The account number MUST be a valid number");
+			throw new IllegalArgumentException("The account number MUST be a valid number");
+		}
+
+		if((accountAgency == null)||(accountAgency == "")){
+			bankAccLogger.error("The agency number MUST be a valid number");
+			throw new IllegalArgumentException("The agency number MUST be a valid number");
 		}
 		bankAccLogger.info("A new bank account was created!");
 		this.bankName = bankName;
@@ -47,17 +57,35 @@ public class BankAccount extends Account {
 	 * @return - boolean with true if the bankName and bankID are valid
 	 */
 	private static boolean checkBankIdVsName(String bankName, String bankId){
+		Integer bnkIdNb;
 		
 		if(bankCodesMap.isEmpty()) {
 			getBankCodes();
 			if(bankCodesMap.isEmpty()) {
-				bankAccLogger.error("Cannot check the bank ID!");
+				bankAccLogger.error("Bank Codes map is empty!");
 				throw new NullPointerException("Bank Codes map is empty!");
 			}
-			if(bankCodesMap.containsKey(bankId)){
-				if(bankName.compareTo(bankCodesMap.get(bankId))==0){
-					return true;
-				}
+		}
+		if(bankId == null){
+			bankAccLogger.error("The bank ID cannot be NULL");
+			throw new InvalidParameterException("The bank ID cannot be NULL");
+		}
+		if(bankId == ""){
+			bankAccLogger.error("The bank ID cannot be empty");
+			throw new InvalidParameterException("The bank ID cannot be empty");
+		}
+		if (bankName==null) {
+			bankAccLogger.error("The bank name cannot be NULL");
+			throw new InvalidParameterException("The bank name cannot be NULL");
+		}
+		if(bankName == ""){
+			bankAccLogger.error("The bank name cannot be empty");
+			throw new InvalidParameterException("The bank name cannot be empty");
+		}
+		bnkIdNb=Integer.parseInt(bankId);
+		if(bankCodesMap.containsKey(bnkIdNb.toString())){
+			if(bankName.compareTo(bankCodesMap.get(bnkIdNb.toString()))==0){
+				return true;
 			}
 		}
 		return false;
@@ -71,22 +99,33 @@ public class BankAccount extends Account {
 		File listBanksCodes;
 		List<String> banksCodes;
 		
-		listBanksCodes=new File("./Src/Resources/BrazilBanksCodes.csv");
-		if(listBanksCodes.canRead()){
-			try {
-				banksCodes=(Files.readAllLines(listBanksCodes.toPath()));
-			} catch (IOException e) {
-				bankAccLogger.error("Fail to oppen BrazilBanksCodes.csv");
-				e.printStackTrace();
+		listBanksCodes=new File("Resources/BrazilBanksCodes.csv");
+		boolean testingFile=listBanksCodes.exists();
+		testingFile=listBanksCodes.isFile();
+		System.out.print(testingFile);
+		listBanksCodes.setReadable(true);
+		listBanksCodes=new File("Resources/BrazilBanksCodes.csv");
+		if(!listBanksCodes.exists()) {
+			return false;
+		}
+		try {
+			listBanksCodes.createNewFile();
+			listBanksCodes.setReadable(true);
+			if(listBanksCodes.canRead()){
+				banksCodes=(Files.readAllLines(listBanksCodes.toPath(), StandardCharsets.ISO_8859_1));
+			}
+			else {
+				bankAccLogger.error("BrazilBanksCodes.csv has no read permission!");
 				return false;
 			}
-			for(String line : banksCodes) {
-				bankCodesMap.put(line.split(";")[0], line.split(";")[1]);
-			}
-		}
-		else {
-			bankAccLogger.error("BrazilBanksCodes.csv has no read permission!");
+		} catch (IOException e) {
+			bankAccLogger.error("Fail to oppen BrazilBanksCodes.csv");
+			e.printStackTrace();
 			return false;
+		}
+		for(String line : banksCodes) {
+			bankCodesMap.put(line.split(";")[0], line.split(";")[1]);
+			bankAccLogger.debug(line);
 		}
 		return true;
 	}
